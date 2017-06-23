@@ -1,0 +1,6 @@
+{
+  "name": "EditRepo",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./EditRepo.js"
+}
