@@ -54,6 +54,7 @@ class EditRepo extends Component {
           <div className="col-sm-12">
             <div className="card">
               <div className="card-header">
+                <button type="submit" className="btn btn-sm btn-success" style={{float: 'right'}}><i className="fa fa-dot-circle-o"></i> Save</button>
                 <strong>Repo Name</strong> <small>ID #{ this.props.match.params.repoId }</small>
               </div>
               <div className="card-block">

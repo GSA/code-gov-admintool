@@ -24,17 +24,21 @@ class Dashboard extends Component {
     let _boxes = boxInfo.map(function(box, key) {
       return (
         <div className="col-sm-6 col-lg-3" key={key}>
-          <div className={"card card-inverse card-" + box.color} >
-            <div className="card-block pb-0">
-              <h4 className="mb-0">{ box.metric }</h4>
-              <p>{ box.title }</p>
-            </div>
-            <div className="chart-wrapper px-3">
+          <div className="card">
+            <div className="card-block p-0 clearfix">
+              <i className={"fa fa-bell p-4 font-2xl mr-3 float-left bg-" + box.color}></i>
+              <div className={"h5 mb-0 pt-3 text-" + box.color}>{ box.metric }</div>
+              <div className="text-muted text-uppercase font-weight-bold font-xs">{ box.title }</div>
             </div>
           </div>
         </div>
       );
     });
+
+
+    <div className="col-6 col-lg-3">
+
+    </div>
 
     let repos = [
       { name: 'Best Intern Repo', org: 'OFCIO', url: '#', contact: {name: 'Philip Bale', email: 'philip.j.bale@omb.eop.gov'} },
@@ -74,6 +78,8 @@ class Dashboard extends Component {
       <div className="animated fadeIn">
         <div className="row">
           { _boxes }
+
+
         </div>
 
         <div className="row">
@@ -99,7 +105,7 @@ class Dashboard extends Component {
                     </tr>
                   </thead>
                   <tbody>
-                     { _repoRows } 
+                     { _repoRows }
                   </tbody>
                 </table>
               </div>

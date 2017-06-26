@@ -30,7 +30,7 @@ class Sidebar extends Component {
               <NavLink to={'/dashboard'} className="nav-link" activeClassName="active"><i className="icon-speedometer"></i> Dashboard</NavLink>
             </li>
             <li className="nav-item">
-              <NavLink to={'/components/forms'} className="nav-link" activeClassName="active"><i className="icon-settings"></i> Agency Settings</NavLink>
+              <NavLink to={'/agency/edit'} className="nav-link" activeClassName="active"><i className="icon-settings"></i> Agency Settings</NavLink>
             </li>
             <li className="nav-title">
               Repositories

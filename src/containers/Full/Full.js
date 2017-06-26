@@ -6,6 +6,7 @@ import Breadcrumb from '../../components/Breadcrumb/';
 import Footer from '../../components/Footer/';
 
 import Dashboard from '../../views/Dashboard/'
+import EditAgency from '../../views/Agency/EditAgency/'
 import EditRepo from '../../views/Repos/EditRepo/'
 
 import Charts from '../../views/Charts/'
@@ -33,6 +34,7 @@ class Full extends Component {
             <div className="container-fluid">
               <Switch>
                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
+                <Route path="/agency/edit/" name="EditAgency" component={EditAgency}/>
                 <Route path="/repos/edit/:repoId" name="EditRepo" component={EditRepo}/>
                 <Route path="/components/buttons" name="Buttons" component={Buttons}/>
                 <Route path="/components/cards" name="Cards" component={Cards}/>

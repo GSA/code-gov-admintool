@@ -8932,3 +8932,6 @@ hr.transparent {
   color: white;
   padding: 4px 6px;
   margin-right: 5px; }
+
+.ReactTags__tagInput input {
+  padding: 4px 10px; }

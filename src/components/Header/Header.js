@@ -44,7 +44,7 @@ class Header extends Component {
           </li>
           <a className="navbar-brand" href="#"></a>
           <li className="nav-item px-3">
-            <a className="nav-link" href="#">return to code.gov</a>
+            <a className="nav-link" href="https://code.gov">return to code.gov</a>
           </li>
         </ul>
         <ul className="nav navbar-nav ml-auto">
