@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, ReactDOM } from 'react';
 import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import { WithContext as ReactTags } from 'react-tag-input';
 
@@ -10,6 +10,10 @@ class EditRepo extends Component {
       tags: [{ id: 1, text: "platform" }, { id: 2, text: "government" }, { id: 3, text: "connecting" }, { id: 4, text: "people" }],
       languages: [{ id: 1, text: "java" }, { id: 2, text: "mysql" }]
     };
+  }
+
+  componentDidLoad() { 
+    ReactDOM.findDOMNode(this).scrollTop = 0
   }
 
   handleDelete(tagType, i) {
@@ -168,6 +172,7 @@ class EditRepo extends Component {
                 <h6>Tags</h6>
                 <div>
                   <ReactTags tags={tags}
+                    autofocus={false}
                     handleDelete={this.handleDelete.bind(this, 'tags') }
                     handleAddition={this.handleAddition.bind(this, 'tags') }
                     handleDrag={this.handleDrag.bind(this, 'tags') } />
@@ -177,6 +182,7 @@ class EditRepo extends Component {
                 <h6>Languages</h6>
                 <div>
                   <ReactTags tags={languages}
+                    autofocus={false}
                     handleDelete={this.handleDelete.bind(this, 'languages') }
                     handleAddition={this.handleAddition.bind(this, 'languages') }
                     handleDrag={this.handleDrag.bind(this, 'languages') } />
