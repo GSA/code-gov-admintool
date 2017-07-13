@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Bar, Line } from 'react-chartjs-2';
 import { Dropdown, DropdownMenu, DropdownItem, Progress } from 'reactstrap';
+import { NavLink } from 'react-router-dom'
+import Session from '../../middleware/Session';
 
 const brandPrimary =  '#20a8d8';
 const brandSuccess =  '#4dbd74';
@@ -11,6 +13,9 @@ class Dashboard extends Component {
 
   constructor(props) {
     super(props);
+
+    let agency = Session.getSession();
+    if (agency == null) { window.location.href = "/"; }
   }
 
   render() {
@@ -35,13 +40,8 @@ class Dashboard extends Component {
       );
     });
 
-
-    <div className="col-6 col-lg-3">
-
-    </div>
-
     let repos = [
-      { name: 'Best Intern Repo', org: 'OFCIO', url: '#', contact: {name: 'Philip Bale', email: 'philip.j.bale@omb.eop.gov'} },
+      { name: 'Best Intern Repo', org: 'OFCIO', id: 1, contact: {name: 'Philip Bale', email: 'philip.j.bale@omb.eop.gov'} },
     ];
 
     for (var i = 0; i < 35; i++) repos.push(repos[0]);
@@ -50,7 +50,7 @@ class Dashboard extends Component {
       return (
         <tr key={key}>
           <td>
-            <a href={ repo.url }>{ repo.name }</a>
+            <NavLink to={'/repos/edit/' + repo.id} className="" activeClassName="active">{ repo.name }</NavLink>
             <div className="small text-muted">{ repo.org }</div>
           </td>
           <td>
@@ -78,8 +78,6 @@ class Dashboard extends Component {
       <div className="animated fadeIn">
         <div className="row">
           { _boxes }
-
-
         </div>
 
         <div className="row">

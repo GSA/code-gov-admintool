@@ -1,17 +1,25 @@
 import React, { Component } from 'react';
 import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import { WithContext as ReactTags } from 'react-tag-input';
+import Session from '../../../middleware/Session';
+import { post } from '../../../middleware/Networking';
+
 
 class EditAgency extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
+    let agency = Session.getSession();
+    if (agency == null) { window.location.href = "/"; }
 
+    this.state = {
+      agency: agency
     };
   }
 
   render() {
+    let agency = this.state.agency;
+    console.log(agency);
 
     return (
       <div className="animated fadeIn">
@@ -20,53 +28,58 @@ class EditAgency extends Component {
             <div className="card">
               <div className="card-header">
                 <button type="submit" className="btn btn-sm btn-success" style={{float: 'right'}}><i className="fa fa-dot-circle-o"></i> Save</button>
-                <strong>{ 'OMB' }</strong> <small>ID #{ this.props.match.params.repoId }</small>
+                <strong>{ agency.acronym }</strong> <small>ID #{ agency.id }</small>
               </div>
               <div className="card-block">
                 <div className="row">
                   <div className="form-group col-sm-4">
                     <label>Agency Name</label>
-                    <input type="text" className="form-control" placeholder="ex. Office of Management and Budget"/>
+                    <input type="text" className="form-control" placeholder="ex. Office of Management and Budget" defaultValue={agency.name} name='name'/>
                   </div>
                   <div className="form-group col-sm-4">
                     <label>Agency Acronym</label>
-                    <input type="text" className="form-control" placeholder="ex. OMB"/>
-                  </div> 
+                    <input type="text" className="form-control" placeholder="ex. OMB" defaultValue={agency.acronym} name='acronym'/>
+                  </div>
+                  <div className="form-group col-sm-4">
+                    <label>Agency Icon Link</label>
+                    <input type="text" className="form-control" placeholder="ex. https://cei.org/sites/default/files/OMB-Logo.png" defaultValue={agency.logo_url}/>
+                  </div>
                 </div>
 
 
                 <div className="form-group">
                   <label>Description</label>
-                  <textarea rows='3' type="text" className="form-control" placeholder="ex. The Office of Management and Budget (OMB) serves the President of the United States in overseeing the implementation of his vision across the Executive Branch."/>
+                  <textarea rows='3' type="text" className="form-control" placeholder="ex. The Office of Management and Budget (OMB) serves the President of the United States in overseeing the implementation of his vision across the Executive Branch."
+                    defaultValue={agency.description} />
                 </div>
 
                 <div className="row">
                   <div className="form-group col-sm-3">
                     <label>Contact Name</label>
-                    <input type="text" className="form-control" placeholder="ex. Philip Bale"/>
+                    <input type="text" className="form-control" placeholder="ex. Philip Bale" defaultValue={agency.contact_name}/>
                   </div>
                   <div className="form-group col-sm-3">
                     <label>Contact Email</label>
-                    <input type="text" className="form-control" placeholder="ex. team@code.gov"/>
+                    <input type="text" className="form-control" placeholder="ex. team@code.gov" defaultValue={agency.contact_email}/>
                   </div>
                   <div className="form-group col-sm-3">
                     <label>Contact Phone</label>
-                    <input type="text" className="form-control" placeholder="ex. (123) 456-7890"/>
+                    <input type="text" className="form-control" placeholder="ex. (123) 456-7890" defaultValue={agency.contact_phone}/>
                   </div>
                   <div className="form-group col-sm-3">
                     <label>Contact URL</label>
-                    <input type="text" className="form-control" placeholder="ex. https://twitter.com/@codedotgov"/>
+                    <input type="text" className="form-control" placeholder="ex. https://twitter.com/@codedotgov" defaultValue={agency.contact_url}/>
                   </div>
                 </div>
 
                 <div className="row">
                   <div className="form-group col-sm-4">
                     <label>Source Code Main URL</label>
-                    <input type="text" className="form-control" placeholder="ex. https://github.com/presidential-innovation-fellows/"/>
+                    <input type="text" className="form-control" placeholder="ex. https://github.com/presidential-innovation-fellows/" defaultValue={agency.source_code_url}/>
                   </div>
                   <div className="form-group col-sm-4">
                     <label>Homepage URL</label>
-                    <input type="text" className="form-control" placeholder="ex. https://code.gov"/>
+                    <input type="text" className="form-control" placeholder="ex. https://code.gov" defaultValue={agency.homepage_url}/>
                   </div>
                 </div>
               </div>

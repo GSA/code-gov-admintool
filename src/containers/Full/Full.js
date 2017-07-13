@@ -23,8 +23,8 @@ class Full extends Component {
                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
                 <Route path="/agency/edit/" name="EditAgency" component={EditAgency}/>
                 <Route path="/repos/edit/:repoId" name="EditRepo" component={EditRepo}/>
-                 
-                <Redirect from="/" to="/dashboard"/>
+
+                <Redirect from="/" to="/login"/>
               </Switch>
             </div>
           </main>

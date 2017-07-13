@@ -10,9 +10,10 @@
     "react-scripts": "1.0.6"
   },
   "dependencies": {
-    "bootstrap": "^3.3.7", 
+    "bootstrap": "^3.3.7",
     "chart.js": "2.5.0",
     "history": "^4.6.1",
+    "jquery": "^3.2.1",
     "react": "^15.5.4",
     "react-addons-css-transition-group": "15.5.2",
     "react-addons-transition-group": "15.5.2",

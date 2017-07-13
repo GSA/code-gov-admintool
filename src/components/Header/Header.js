@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Dropdown, DropdownMenu, DropdownItem } from 'reactstrap';
+import Session from '../../middleware/Session';
 
 class Header extends Component {
 
@@ -16,6 +17,11 @@ class Header extends Component {
     this.setState({
       dropdownOpen: !this.state.dropdownOpen
     });
+  }
+
+  logout() {
+    Session.destroy();
+    window.location.href = "/";
   }
 
   sidebarToggle(e) {
@@ -56,7 +62,7 @@ class Header extends Component {
               </button>
 
               <DropdownMenu className="dropdown-menu-right">
-                <DropdownItem><i className="fa fa-lock"></i> Logout</DropdownItem>
+                <DropdownItem onClick={this.logout.bind(this)}><i className="fa fa-lock"></i> Logout</DropdownItem>
 
               </DropdownMenu>
             </Dropdown>
