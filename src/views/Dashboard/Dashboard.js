@@ -3,6 +3,16 @@ import { Bar, Line } from 'react-chartjs-2';
 import { Dropdown, DropdownMenu, DropdownItem, Progress } from 'reactstrap';
 import { NavLink } from 'react-router-dom'
 import Session from '../../middleware/Session';
+import { post, resolveBackendUrl } from '../../middleware/Networking';
+import javascriptTimeAgo from 'javascript-time-ago'
+import ReactConfirmAlert, { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
+
+javascriptTimeAgo.locale(require('javascript-time-ago/locales/en'))
+require('javascript-time-ago/intl-messageformat-global')
+require('intl-messageformat/dist/locale-data/en')
+
+const timeAgoEnglish = new javascriptTimeAgo('en-US')
 
 const brandPrimary =  '#20a8d8';
 const brandSuccess =  '#4dbd74';
@@ -16,13 +26,40 @@ class Dashboard extends Component {
 
     let agency = Session.getSession();
     if (agency == null) { window.location.href = "/"; }
+    this.state = {
+      agency: agency
+    }
   }
 
-  render() {
+  addRepo() {
+    post(resolveBackendUrl('/repos/add'), Session.getToken(), null, function(err, data) {
+      window.location = '/#/repos/edit/' + data.repo.id;
+    });
+  }
 
-    let boxInfo = [{ metric: 25, title: 'Total Repositories', color: 'primary'},
-      { metric: '25 Million', title: 'Lines of Code', color: 'info'},
-      { metric: 300, title: 'Contributers', color: 'warning'},
+  deleteRepo = (id) => {
+    confirmAlert({
+      title: 'Please Confirm',
+      message: 'Are you sure to delete this repo?',
+      confirmLabel: 'Confirm',
+      cancelLabel: 'Cancel',
+      onConfirm: () => post(resolveBackendUrl('/repos/delete'), Session.getToken(), {id: id}, function(err, data) {
+        window.location.reload();
+      }),
+      onCancel: () => console.log('Delete cancelled'),
+    })
+  };
+
+  render() {
+    let agency = this.state.agency;
+
+    let repoCount = this.props.repos ? this.props.repos.length : 0;
+    let reusableCount = this.props.repos ? this.props.repos.filter((repo) => repo.reusable).length : 0;
+    let openSourceCount = this.props.repos ? this.props.repos.filter((repo) => repo.open_source).length : 0;
+
+    let boxInfo = [{ metric: repoCount, title: 'Total Repositories', color: 'primary'},
+      { metric: reusableCount, title: 'Reusable Repos', color: 'info'},
+      { metric: openSourceCount, title: 'Open Source Repos', color: 'info'},
       { metric: 1, title: 'Awesome Intern', color: 'danger'}
     ];
 
@@ -40,35 +77,34 @@ class Dashboard extends Component {
       );
     });
 
-    let repos = [
-      { name: 'Best Intern Repo', org: 'OFCIO', id: 1, contact: {name: 'Philip Bale', email: 'philip.j.bale@omb.eop.gov'} },
-    ];
+    let repos = this.props.repos || [];
 
-    for (var i = 0; i < 35; i++) repos.push(repos[0]);
-
+    let that = this;
     let _repoRows = repos.map(function(repo, key) {
       return (
         <tr key={key}>
           <td>
             <NavLink to={'/repos/edit/' + repo.id} className="" activeClassName="active">{ repo.name }</NavLink>
-            <div className="small text-muted">{ repo.org }</div>
+            <div className="small text-muted">{ repo.organization }</div>
           </td>
           <td>
             <span className="badge badge-success">Active</span>
           </td>
           <td>
-            <span className="badge badge-primary">Reusable</span> <br /><span className="badge badge-info">Open Source</span>
+            { repo.reusable ? <span className="badge badge-primary">Reusable</span> : ''}
+            { repo.reusable ? <br /> : '' }
+            { repo.open_source ? <span className="badge badge-info">Open Source</span> : ''}
           </td>
           <td>
-            <a href={ 'mailto:' + repo.contact.email }>{ repo.contact.name }</a>
-            <div className="small text-muted">{ repo.contact.email }</div>
+            <a href={ 'mailto:' + repo.contact_email }>{ repo.contact_name }</a>
+            <div className="small text-muted">{ repo.contact_email }</div>
           </td>
           <td>
-            10 seconds ago
+            { timeAgoEnglish.format(new Date(repo.updatedAt)) }
           </td>
           <td>
-            <button className='btn btn-primary btn-sm'>Edit Metadata</button>&nbsp; &nbsp;
-            <button className='btn btn-danger btn-sm'>Delete</button>
+            <NavLink to={'/repos/edit/' + repo.id} className="btn btn-primary btn-sm">Edit Metadata</NavLink>&nbsp; &nbsp;
+            <button className='btn btn-danger btn-sm' onClick={that.deleteRepo.bind(this, repo.id)}>Delete</button>
           </td>
         </tr>
       );
@@ -85,10 +121,10 @@ class Dashboard extends Component {
             <div className="card">
               <div className="card-header">
                 <div className="float-right">
-                  <button type="button" className="btn btn-sm btn-success"><i className="fa fa-plus" ></i> Add New Repository
+                  <button type="button" className="btn btn-sm btn-success" onClick={this.addRepo.bind(this)}><i className="fa fa-plus" ></i> Add New Repository
                   </button>
                 </div>
-                Current Repositories
+                Current {agency.acronym} Repositories
               </div>
               <div className="card-block">
                 <table className="table table-hover table-outline mb-0 hidden-sm-down">

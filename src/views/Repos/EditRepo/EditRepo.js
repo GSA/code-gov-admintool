@@ -2,17 +2,73 @@ import React, { Component, ReactDOM } from 'react';
 import { Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import { WithContext as ReactTags } from 'react-tag-input';
 
+import Session from '../../../middleware/Session';
+import { post, get, resolveBackendUrl} from '../../../middleware/Networking';
+
 class EditRepo extends Component {
   constructor(props) {
     super(props);
 
+    let agency = Session.getSession();
+    if (agency == null) { window.location.href = "/"; }
+
     this.state = {
+      repoId: this.props.match.params.repoId,
+      updateVars: {},
       tags: [{ id: 1, text: "platform" }, { id: 2, text: "government" }, { id: 3, text: "connecting" }, { id: 4, text: "people" }],
-      languages: [{ id: 1, text: "java" }, { id: 2, text: "mysql" }]
+      languages: [{ id: 1, text: "java" }, { id: 2, text: "mysql" }],
+      curRepo: null
     };
+
+    this.loadRepo();
   }
 
-  componentDidLoad() { 
+  componentDidUpdate() {
+    let curRepoId = this.props.match.params.repoId;
+    if (this.state.repoId !== curRepoId) {
+      window.location.reload();
+      // this.setState({repoId: curRepoId});
+      // this.loadRepo();
+    }
+  }
+
+  handleChange(e) {
+    let updateVars = this.state.updateVars;
+    updateVars[e.target.name] = e.target.value;
+
+    if (e.target.name === 'open_source' || e.target.name === 'reusable') {
+      updateVars[e.target.name] = e.target.checked;
+    }
+
+    this.setState(updateVars: updateVars);
+  }
+
+  save() {
+    let that = this;
+    let updateVars = this.state.updateVars;
+    updateVars['id'] = this.state.repoId;
+
+    let langs = this.state.languages;
+    let tags = this.state.tags;
+    updateVars['languages'] = JSON.stringify(langs);
+    updateVars['tags'] = JSON.stringify(tags);
+
+    post(resolveBackendUrl('/repos/update'), Session.getToken(), updateVars, function(err, data) {
+      window.location.reload();
+    });
+  }
+
+  loadRepo() {
+    let that = this;
+    get(resolveBackendUrl('/repos/raw/') + this.state.repoId, Session.getToken(), function(err, data) {
+      if (data) {
+        console.log(data);
+        that.setState({curRepo: data, languages: JSON.parse(data.languages), tags: JSON.parse(data.tags)});
+      }
+    });
+  }
+
+  componentDidLoad() {
     ReactDOM.findDOMNode(this).scrollTop = 0
   }
 
@@ -50,7 +106,11 @@ class EditRepo extends Component {
   }
 
   render() {
-    const { tags, languages } = this.state;
+    const { tags, languages, curRepo} = this.state;
+
+    if (!curRepo) {
+      return (<h1></h1>);
+    }
 
     return (
       <div className="animated fadeIn">
@@ -58,94 +118,90 @@ class EditRepo extends Component {
           <div className="col-sm-12">
             <div className="card">
               <div className="card-header">
-                <button type="submit" className="btn btn-sm btn-success" style={{float: 'right'}}><i className="fa fa-dot-circle-o"></i> Save</button>
-                <strong>Repo Name</strong> <small>ID #{ this.props.match.params.repoId }</small>
+                <button type="submit" onClick={this.save.bind(this)} className="btn btn-sm btn-success" style={{float: 'right'}}><i className="fa fa-dot-circle-o"></i> Save</button>
+                <strong>Repo Name</strong> <small>ID #{ curRepo.id }</small>
               </div>
               <div className="card-block">
                 <div className="row">
                   <div className="form-group col-sm-4">
                     <label>Repository Name</label>
-                    <input type="text" className="form-control" placeholder="ex. HR Recruiting Management"/>
+                    <input type="text" className="form-control" placeholder="ex. HR Recruiting Management" defaultValue={curRepo.name} name='name' onChange={this.handleChange.bind(this)}/>
                   </div>
                   <div className="form-group col-sm-4">
                     <label>Organization</label>
-                    <input type="text" className="form-control" placeholder="ex. OFCIO"/>
-                  </div>
-                  <div className="form-group col-sm-4">
-                    <label>Version (deprecate?)</label>
-                    <input type="text" className="form-control" placeholder="ex. 1.0.1"/>
+                    <input type="text" className="form-control" placeholder="ex. OFCIO" defaultValue={curRepo.organization} name='organization' onChange={this.handleChange.bind(this)}/>
                   </div>
                 </div>
 
 
                 <div className="form-group">
                   <label>Description</label>
-                  <textarea rows='3' type="text" className="form-control" placeholder="ex. Helps HR recruit the best candidates!"/>
+                  <textarea rows='3' type="text" className="form-control" placeholder="ex. Helps HR recruit the best candidates!"  defaultValue={curRepo.description} name='description' onChange={this.handleChange.bind(this)}/>
                 </div>
 
                 <div className="row">
                   <div className="form-group col-sm-3">
                     <label>Status</label>
-                    <input type="text" className="form-control" placeholder="ex. Alpha"/>
+                    <input type="text" className="form-control" placeholder="ex. Alpha"  defaultValue={curRepo.status} name='status' onChange={this.handleChange.bind(this)}/>
                   </div>
                   <div className="form-group col-sm-3">
                     <label>License</label>
-                    <input type="text" className="form-control" placeholder="ex. MIT"/>
+                    <input type="text" className="form-control" placeholder="ex. MIT" defaultValue={curRepo.license} name='license' onChange={this.handleChange.bind(this)}/>
                   </div>
                   <div className="form-group col-sm-3">
                     <label>Version Control System</label>
-                    <input type="text" className="form-control" placeholder="ex. Git"/>
+                    <input type="text" className="form-control" placeholder="ex. Git" defaultValue={curRepo.vcs} name='vcs' onChange={this.handleChange.bind(this)}/>
                   </div>
                   <div className="form-group col-sm-3">
                     <label>Availability</label><br />
-                    <input type="checkbox" name="inline-checkbox1" value="option1"/> Reusable
+                    <input type="checkbox" name="inline-checkbox1" defaultChecked={curRepo.reusable} name='reusable' onChange={this.handleChange.bind(this)}/> Reusable
                     &nbsp; &nbsp;
-                    <input type="checkbox" name="inline-checkbox1" value="option1"/> Open Source
+                    <input type="checkbox" name="inline-checkbox1" defaultChecked={curRepo.open_source} name='open_source' onChange={this.handleChange.bind(this)}/> Open Source
                   </div>
                 </div>
 
                 <div className="row">
                   <div className="form-group col-sm-3">
                     <label>Contact Name</label>
-                    <input type="text" className="form-control" placeholder="ex. Philip Bale"/>
+                    <input type="text" className="form-control" placeholder="ex. Philip Bale"  defaultValue={curRepo.contact_name} name='contact_name' onChange={this.handleChange.bind(this)}/>
                   </div>
                   <div className="form-group col-sm-3">
                     <label>Contact Email</label>
-                    <input type="text" className="form-control" placeholder="ex. team@code.gov"/>
+                    <input type="text" className="form-control" placeholder="ex. team@code.gov"  defaultValue={curRepo.contact_email} name='contact_email' onChange={this.handleChange.bind(this)}/>
                   </div>
                   <div className="form-group col-sm-3">
                     <label>Contact Phone</label>
-                    <input type="text" className="form-control" placeholder="ex. (123) 456-7890"/>
+                    <input type="text" className="form-control" placeholder="ex. (123) 456-7890"  defaultValue={curRepo.contact_phone} name='contact_phone' onChange={this.handleChange.bind(this)}/>
                   </div>
                   <div className="form-group col-sm-3">
                     <label>Contact URL</label>
-                    <input type="text" className="form-control" placeholder="ex. https://twitter.com/@codedotgov"/>
+                    <input type="text" className="form-control" placeholder="ex. https://twitter.com/@codedotgov"  defaultValue={curRepo.contact_url} name='contact_url' onChange={this.handleChange.bind(this)}/>
                   </div>
                 </div>
 
                 <div className="row">
                   <div className="form-group col-sm-4">
                     <label>Source Code URL</label>
-                    <input type="text" className="form-control" placeholder="ex. https://github.com/presidential-innovation-fellows/code-gov-web"/>
+                    <input type="text" className="form-control" placeholder="ex. https://github.com/presidential-innovation-fellows/code-gov-web" defaultValue={curRepo.source_code_url} name='source_code_url' onChange={this.handleChange.bind(this)}/>
                   </div>
                   <div className="form-group col-sm-4">
                     <label>Homepage URL</label>
-                    <input type="text" className="form-control" placeholder="ex. https://code.gov"/>
+                    <input type="text" className="form-control" placeholder="ex. https://code.gov" defaultValue={curRepo.homepage_url} name='homepage_url' onChange={this.handleChange.bind(this)}/>
                   </div>
                   <div className="form-group col-sm-4">
                     <label>Download URL</label>
-                    <input type="text" className="form-control" placeholder="ex. https://github.com/presidential-innovation-fellows/code-gov-web/dist.tar.gz"/>
+                    <input type="text" className="form-control" placeholder="ex. https://github.com/presidential-innovation-fellows/code-gov-web/dist.tar.gz"  defaultValue={curRepo.download_url} name='download_url' onChange={this.handleChange.bind(this)}/>
                   </div>
                 </div>
 
                 <div className="row">
                   <div className="form-group col-sm-3">
                     <label>Exemption</label>
-                    <input type="text" className="form-control" placeholder="ex. 0"/>
+                    <input type="text" className="form-control" placeholder="ex. 0" defaultValue={curRepo.exemption} name='exemption' onChange={this.handleChange.bind(this)}/>
                   </div>
                   <div className="form-group col-sm-4">
                     <label>Exemption Text</label>
-                    <input type="text" className="form-control" placeholder="ex. National Security"/>
+                    <input type="text" className="form-control" placeholder="ex. National Security" defaultValue={curRepo.exemption_text} name='exemption_text' onChange={this.handleChange.bind(this)}/>
                   </div>
                 </div>
 

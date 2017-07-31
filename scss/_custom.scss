@@ -1,4 +1,8 @@
 // Here you can add other styles
+.center {
+  text-align: center;
+}
+
 .ReactTags__tags {
   margin-top: 12px;
   margin-bottom: 5px;
@@ -18,4 +22,12 @@
 
 .ReactTags__tagInput input {
   padding: 4px 10px;
+}
+
+.about {
+  img {
+    max-width: 70%;
+    text-align: center;
+    margin: 0 auto;
+  }
 }

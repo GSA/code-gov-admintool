@@ -13,11 +13,11 @@ class Sidebar extends Component {
   }
 
   render() {
-    let repoDetails = [ { name: 'Philip', link: '#' }, { name: 'is', link: '#' }, { name: 'the', link: '#' }, { name: 'best', link: '#' }, { name: 'intern', link: '#' }, { name: 'ever', link: '#' }];
-    let _repos = repoDetails.map(function(repo, key) {
+    let repos = this.props.repos || [];
+    let _repos = repos.map(function(repo, key) {
       return (
         <li className='nav-item' key={key}>
-          <NavLink to={'/repos/edit/' + key} className="nav-link" activeClassName="active">{repo.name}</NavLink>
+          <NavLink to={'/repos/edit/' + repo.id} className="nav-link" activeClassName="active">{repo.name}</NavLink>
         </li>
       );
     });

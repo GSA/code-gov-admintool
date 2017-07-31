@@ -1,15 +1,20 @@
 import React, { Component } from 'react';
 import { Dropdown, DropdownMenu, DropdownItem } from 'reactstrap';
 import Session from '../../middleware/Session';
+import { NavLink } from 'react-router-dom'
+
 
 class Header extends Component {
 
   constructor(props) {
     super(props);
 
+    let agency = Session.getSession();
+
     this.toggle = this.toggle.bind(this);
     this.state = {
-      dropdownOpen: false
+      dropdownOpen: false,
+      agency: agency
     };
   }
 
@@ -40,6 +45,8 @@ class Header extends Component {
   }
 
   render() {
+    let agency = this.state.agency;
+
     return (
       <header className="app-header navbar">
         <button className="navbar-toggler mobile-sidebar-toggler d-lg-none" type="button" onClick={this.mobileSidebarToggle}>&#9776;</button>
@@ -52,13 +59,16 @@ class Header extends Component {
           <li className="nav-item px-3">
             <a className="nav-link" href="https://code.gov">return to code.gov</a>
           </li>
+          <li className="nav-item px-3">
+            <NavLink to={'/about'} className="nav-link">about</NavLink> 
+          </li>
         </ul>
         <ul className="nav navbar-nav ml-auto">
           <li className="nav-item">
             <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
               <button onClick={this.toggle} className="nav-link dropdown-toggle" data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded={this.state.dropdownOpen}>
-                <img src={'https://cei.org/sites/default/files/OMB-Logo.png'} className="img-avatar" alt="admin@bootstrapmaster.com"/>
-                <span className="d-md-down-none">OMB</span>
+                <img src={agency && agency.logo_url} className="img-avatar" alt=""/>
+                <span className="d-md-down-none">{ agency && agency.acronym }</span>
               </button>
 
               <DropdownMenu className="dropdown-menu-right">

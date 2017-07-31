@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import { HashRouter, BrowserRouter, Route, Switch } from 'react-router-dom'
-import { post } from '../../../middleware/Networking.js';
+import { post, resolveBackendUrl } from '../../../middleware/Networking.js';
 import Session from '../../../middleware/Session';
 
 class Login extends Component {
 
   constructor(props) {
     super(props);
+
+    if (Session.getSession() !== null) { window.location.href = "/#/dashboard"; }
 
     this.state = {
       email: '',
@@ -20,7 +22,7 @@ class Login extends Component {
 
   attemptLogin() {
     let that = this;
-    post('http://localhost:3033/token', null, {email: this.state.email, password: this.state.password}, function(err, data) { 
+    post(resolveBackendUrl('/token'), null, {email: this.state.email, password: this.state.password}, function(err, data) {
       if (!err) {
         Session.createSession(data.token, function(success) {
           if (success) that.props.history.push('/dashboard');
@@ -60,7 +62,7 @@ class Login extends Component {
                     <div>
                       <h2>No Account?  <br />Forgot Password?</h2>
                       <p>Access is granted by the <strong><a href='http://Code.gov' style={{color: 'white'}}>Code.gov team</a></strong>.  Reach out to us for your agency access! </p>
-                      <button type="button" className="btn btn-primary active mt-3">Contact Code.gov</button>
+                      <a href="http://code.gov"><button type="button" className="btn btn-primary active mt-3">Contact Code.gov</button></a>
                     </div>
                   </div>
                 </div>
