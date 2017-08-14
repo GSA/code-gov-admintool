@@ -15,8 +15,9 @@ class EditRepo extends Component {
     this.state = {
       repoId: this.props.match.params.repoId,
       updateVars: {},
-      tags: [{ id: 1, text: "platform" }, { id: 2, text: "government" }, { id: 3, text: "connecting" }, { id: 4, text: "people" }],
-      languages: [{ id: 1, text: "java" }, { id: 2, text: "mysql" }],
+      tags: [],
+      languages: [],
+      partners: [],
       curRepo: null
     };
 
@@ -50,8 +51,16 @@ class EditRepo extends Component {
 
     let langs = this.state.languages;
     let tags = this.state.tags;
+    let partners = this.state.partners;
+
+    for (var i = 0; i < partners.length; i++) {
+      partners[i].name = this.refs['partnerName' + i].value;
+      partners[i].email = this.refs['partnerEmail' + i].value;
+    }
+
     updateVars['languages'] = JSON.stringify(langs);
     updateVars['tags'] = JSON.stringify(tags);
+    updateVars['partners'] = JSON.stringify(partners);
 
     post(resolveBackendUrl('/repos/update'), Session.getToken(), updateVars, function(err, data) {
       window.location.reload();
@@ -63,7 +72,7 @@ class EditRepo extends Component {
     get(resolveBackendUrl('/repos/raw/') + this.state.repoId, Session.getToken(), function(err, data) {
       if (data) {
         console.log(data);
-        that.setState({curRepo: data, languages: JSON.parse(data.languages), tags: JSON.parse(data.tags)});
+        that.setState({curRepo: data, languages: JSON.parse(data.languages) || [], tags: JSON.parse(data.tags) || [], partners: JSON.parse(data.partners) || []});
       }
     });
   }
@@ -105,12 +114,43 @@ class EditRepo extends Component {
     this.setState(obj);
   }
 
+  addPartner() {
+    let partners = this.state.partners || [];
+    partners.push({name: '', email: ''});
+    this.setState({partners: partners});
+  }
+
+  removePartner(index) {
+    let partners = this.state.partners || [];
+    delete partners[index]
+    this.setState({partners: partners});
+  }
+
   render() {
     const { tags, languages, curRepo} = this.state;
 
     if (!curRepo) {
       return (<h1></h1>);
     }
+
+    let partners = this.state.partners;
+    if (partners.length == 0) partners.push({name: '', email: ''});
+
+    let _partnerInputs = partners.map((partner, key) => {
+      return (
+        <div className="row" key={key}>
+          <div className="form-group col-sm-3">
+            <input type="text" className="form-control" placeholder="ex. Philip Bale" ref={'partnerName'+key} defaultValue={partner.name} />
+          </div>
+          <div className="form-group col-sm-3">
+            <input type="text" className="form-control" placeholder="ex. team@omb.eop.gov" ref={'partnerEmail'+key} defaultValue={partner.email}/>
+          </div>
+          <div className="form-group col-sm-3">
+            <button className='btn btn-danger btn-sm' onClick={this.removePartner.bind(this, key)}><i className='fa fa-trash'></i> Remove</button>
+          </div>
+        </div>
+      )
+    });
 
     return (
       <div className="animated fadeIn">
@@ -208,20 +248,16 @@ class EditRepo extends Component {
                 <hr />
                 <h6>Partners</h6>
                 <div className="row">
-                  <div className="form-group col-sm-3">
+                  <div className="col-sm-3">
                     <label>Name</label>
-                    <input type="text" className="form-control" placeholder="ex. Philip Bale"/>
                   </div>
-                  <div className="form-group col-sm-3">
+                  <div className="col-sm-3">
                     <label>Email</label>
-                    <input type="text" className="form-control" placeholder="ex. team@omb.eop.gov"/>
-                  </div>
-                  <div className="form-group col-sm-3">
-                    <label>&nbsp;</label><br />
-                    <button className='btn btn-danger btn-sm'><i className='fa fa-trash'></i> Remove</button>
                   </div>
                 </div>
-                <button className='btn btn-primary btn-sm'><i className='fa fa-plus'></i> Add New Partner</button>
+                { _partnerInputs }
+
+                <button className='btn btn-primary btn-sm' onClick={this.addPartner.bind(this)}><i className='fa fa-plus'></i> Add New Partner</button>
 
                 <br />
                 <hr />

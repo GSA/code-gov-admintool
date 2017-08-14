@@ -7,6 +7,7 @@ import { post, resolveBackendUrl } from '../../middleware/Networking';
 import javascriptTimeAgo from 'javascript-time-ago'
 import ReactConfirmAlert, { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
+import $ from 'jquery';
 
 javascriptTimeAgo.locale(require('javascript-time-ago/locales/en'))
 require('javascript-time-ago/intl-messageformat-global')
@@ -31,6 +32,10 @@ class Dashboard extends Component {
     }
   }
 
+  componentDidMount() {
+    $("#my-file").change(() => this.uploadJson());
+  }
+
   addRepo() {
     post(resolveBackendUrl('/repos/add'), Session.getToken(), null, function(err, data) {
       window.location = '/#/repos/edit/' + data.repo.id;
@@ -50,17 +55,37 @@ class Dashboard extends Component {
     })
   };
 
+  uploadJson() {
+    let file = $('#my-file').prop('files')[0];
+
+    if (file) {
+      let fr = new FileReader();
+      fr.onload = () => {
+        let jsonObject = JSON.parse(fr.result);
+        console.log(jsonObject);
+
+        post(resolveBackendUrl('/repos/add-json'), Session.getToken(), {codeJson: JSON.stringify(jsonObject)}, function(err, data) {
+          console.log("Org Count: " + data.orgCount);
+          window.location.reload();
+        });
+      }
+
+      fr.readAsText(file);
+    }
+  }
+
   render() {
     let agency = this.state.agency;
 
     let repoCount = this.props.repos ? this.props.repos.length : 0;
     let reusableCount = this.props.repos ? this.props.repos.filter((repo) => repo.reusable).length : 0;
     let openSourceCount = this.props.repos ? this.props.repos.filter((repo) => repo.open_source).length : 0;
+    let percentOpenSource = (parseFloat(openSourceCount) / parseFloat(repoCount) * 100).toFixed(2)
 
     let boxInfo = [{ metric: repoCount, title: 'Total Repositories', color: 'primary'},
       { metric: reusableCount, title: 'Reusable Repos', color: 'info'},
       { metric: openSourceCount, title: 'Open Source Repos', color: 'info'},
-      { metric: 1, title: 'Awesome Intern', color: 'danger'}
+      { metric: percentOpenSource + '%', title: 'Open Source', color: 'danger'}
     ];
 
     let _boxes = boxInfo.map(function(box, key) {
@@ -121,6 +146,9 @@ class Dashboard extends Component {
             <div className="card">
               <div className="card-header">
                 <div className="float-right">
+                  <input type="file" name="my_file" id="my-file" accept='.json' style={{display: 'none'}} />
+                  <button type="button" onClick={()=> $('#my-file').click()} className="btn btn-sm btn-primary"><i className="fa fa-plus" ></i> Import from Code.json
+                  </button>&nbsp;&nbsp;&nbsp;
                   <button type="button" className="btn btn-sm btn-success" onClick={this.addRepo.bind(this)}><i className="fa fa-plus" ></i> Add New Repository
                   </button>
                 </div>

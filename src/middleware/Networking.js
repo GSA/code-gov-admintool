@@ -1,11 +1,10 @@
 import $ from 'jquery';
 
 export function resolveBackendUrl(url) {
-  console.log(window.location.host);
-  if (window.location.host.indexOf("localhost" >= 0)) {
-      return 'http://localhost:3033' + url;
+  if (window.location.host.indexOf("localhost") >= 0) {
+    return 'http://localhost:3033' + url;
   } else {
-    return 'https://admin-tool-backend.code.gov' + url;
+    return 'http://08664f30.ngrok.io' + url;
   }
 }
 export function post(url, token, data, completion) {
