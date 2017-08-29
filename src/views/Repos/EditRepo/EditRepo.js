@@ -17,7 +17,10 @@ class EditRepo extends Component {
       updateVars: {},
       tags: [],
       languages: [],
+      licenses: [],
       partners: [],
+      related_code: [],
+      reused_code: [],
       curRepo: null
     };
 
@@ -52,18 +55,40 @@ class EditRepo extends Component {
     let langs = this.state.languages;
     let tags = this.state.tags;
     let partners = this.state.partners;
+    const licenses = this.state.licenses;
+    const related_code = this.state.related_code;
+    const reused_code = this.state.reused_code;
 
     for (var i = 0; i < partners.length; i++) {
       partners[i].name = this.refs['partnerName' + i].value;
       partners[i].email = this.refs['partnerEmail' + i].value;
     }
 
+    for (var i = 0; i < licenses.length; i++) {
+      licenses[i].name = this.refs['licenseName' + i].value;
+      licenses[i].URL = this.refs['licenseURL' + i].value;
+    }
+
+    for (var i = 0; i < related_code.length; i++) {
+      related_code[i].codeName = this.refs['relatedCodeName' + i].value;
+      related_code[i].codeURL = this.refs['relatedCodeURL' + i].value;
+      related_code[i].isGovernmentRepo = this.refs['relatedCodeGovernment' + i].checked;
+    }
+
+    for (var i = 0; i < reused_code.length; i++) {
+      reused_code[i].name = this.refs['reusedCodeName' + i].value;
+      reused_code[i].URL = this.refs['reusedCodeURL' + i].value;
+    }
+
     updateVars['languages'] = JSON.stringify(langs);
     updateVars['tags'] = JSON.stringify(tags);
     updateVars['partners'] = JSON.stringify(partners);
+    updateVars['licenses'] = JSON.stringify(licenses);
+    updateVars['related_code'] = JSON.stringify(related_code);
+    updateVars['reused_code'] = JSON.stringify(reused_code);
 
     post(resolveBackendUrl('/repos/update'), Session.getToken(), updateVars, function(err, data) {
-      window.location.reload();
+      // window.location.reload();
     });
   }
 
@@ -71,8 +96,15 @@ class EditRepo extends Component {
     let that = this;
     get(resolveBackendUrl('/repos/raw/') + this.state.repoId, Session.getToken(), function(err, data) {
       if (data) {
-        console.log(data);
-        that.setState({curRepo: data, languages: JSON.parse(data.languages) || [], tags: JSON.parse(data.tags) || [], partners: JSON.parse(data.partners) || []});
+        that.setState({
+          curRepo: data,
+          languages: JSON.parse(data.languages) || [],
+          tags: JSON.parse(data.tags) || [],
+          partners: JSON.parse(data.partners) || [],
+          licenses: JSON.parse(data.licenses) || [],
+          related_code: JSON.parse(data.related_code) || [],
+          reused_code: JSON.parse(data.reused_code) || [],
+        });
       }
     });
   }
@@ -126,12 +158,66 @@ class EditRepo extends Component {
     this.setState({partners: partners});
   }
 
+  addLicense() {
+    let licenses = this.state.licenses || [];
+    licenses.push({name: '', URL: ''});
+    this.setState({licenses});
+  }
+
+  removeLicense(index) {
+    let licenses = this.state.licenses || [];
+    delete licenses[index]
+    this.setState({licenses});
+  }
+
+  addRelatedCode() {
+    let related_code = this.state.related_code || [];
+    related_code.push({codeName: '', codeURL: '', isGovernmentRepo: false});
+    this.setState({related_code});
+  }
+
+  removeRelatedCode(index) {
+    let related_code = this.state.related_code || [];
+    delete related_code[index]
+    this.setState({related_code});
+  }
+
+  addReusedCode() {
+    let reused_code = this.state.reused_code || [];
+    reused_code.push({name: '', URL: ''});
+    this.setState({reused_code});
+  }
+
+  removeReusedCode(index) {
+    let reused_code = this.state.reused_code || [];
+    delete reused_code[index]
+    this.setState({reused_code});
+  }
+
   render() {
-    const { tags, languages, curRepo} = this.state;
+    const { tags, languages, curRepo, licenses, related_code, reused_code } = this.state;
 
     if (!curRepo) {
       return (<h1></h1>);
     }
+
+    if (licenses.length == 0) licenses.push({name: '', URL: ''});
+
+    const _licensesInputs = licenses.map((license, key) => {
+      return (
+        <div className="row" key={key}>
+          <div className="form-group col-sm-3">
+            <input type="text" className="form-control" placeholder="ex. CCO" ref={'licenseName'+key} defaultValue={license.name} />
+          </div>
+          <div className="form-group col-sm-3">
+            <input type="text" className="form-control" placeholder="ex. https://path.to/license" ref={'licenseURL'+key} defaultValue={license.URL}/>
+          </div>
+          <div className="form-group col-sm-3">
+            <button className='btn btn-danger btn-sm' onClick={this.removeLicense.bind(this, key)}><i className='fa fa-trash'></i> Remove</button>
+          </div>
+        </div>
+      )
+    });
 
     let partners = this.state.partners;
     if (partners.length == 0) partners.push({name: '', email: ''});
@@ -147,6 +233,45 @@ class EditRepo extends Component {
           </div>
           <div className="form-group col-sm-3">
             <button className='btn btn-danger btn-sm' onClick={this.removePartner.bind(this, key)}><i className='fa fa-trash'></i> Remove</button>
+          </div>
+        </div>
+      )
+    });
+
+    if (related_code.length == 0) related_code.push({codeName: '', codeURL: '', isGovernmentRepo: false});
+
+    const _relatedCodeInputs = related_code.map((rc, key) => {
+      return (
+        <div className="row" key={key}>
+          <div className="form-group col-sm-3">
+            <input type="text" className="form-control" placeholder="ex. Related Code Library" ref={'relatedCodeName'+key} defaultValue={rc.codeName} />
+          </div>
+          <div className="form-group col-sm-3">
+            <input type="text" className="form-control" placeholder="ex. https://path.to/relatedCode" ref={'relatedCodeURL'+key} defaultValue={rc.codeURL}/>
+          </div>
+          <div className="form-group col-sm-3">
+            <input type="checkbox" ref={'relatedCodeGovernment'+key} defaultChecked={rc.isGovernmentRepo} />
+          </div>
+          <div className="form-group col-sm-3">
+            <button className='btn btn-danger btn-sm' onClick={this.removeRelatedCode.bind(this, key)}><i className='fa fa-trash'></i> Remove</button>
+          </div>
+        </div>
+      )
+    });
+
+    if (reused_code.length == 0) reused_code.push({name: '', URL: ''});
+
+    const _reusedCodeInputs = reused_code.map((rc, key) => {
+      return (
+        <div className="row" key={key}>
+          <div className="form-group col-sm-3">
+            <input type="text" className="form-control" placeholder="ex. Reused Code Library" ref={'reusedCodeName'+key} defaultValue={rc.name} />
+          </div>
+          <div className="form-group col-sm-3">
+            <input type="text" className="form-control" placeholder="ex. https://path.to/reusedCode" ref={'reusedCodeURL'+key} defaultValue={rc.URL}/>
+          </div>
+          <div className="form-group col-sm-3">
+            <button className='btn btn-danger btn-sm' onClick={this.removeLicense.bind(this, key)}><i className='fa fa-trash'></i> Remove</button>
           </div>
         </div>
       )
@@ -182,21 +307,53 @@ class EditRepo extends Component {
                 <div className="row">
                   <div className="form-group col-sm-3">
                     <label>Status</label>
-                    <input type="text" className="form-control" placeholder="ex. Alpha"  defaultValue={curRepo.status} name='status' onChange={this.handleChange.bind(this)}/>
-                  </div>
-                  <div className="form-group col-sm-3">
-                    <label>License</label>
-                    <input type="text" className="form-control" placeholder="ex. MIT" defaultValue={curRepo.license} name='license' onChange={this.handleChange.bind(this)}/>
+                    <select className="form-control" defaultValue={curRepo.status} name='status' onChange={this.handleChange.bind(this)}>
+                      <option value="Ideation">Ideation</option>
+                      <option value="Development">Development</option>
+                      <option value="Alpha">Alpha</option>
+                      <option value="Beta">Beta</option>
+                      <option value="Release Candidate">Release Candidate</option>
+                      <option value="Production">Production</option>
+                      <option value="Archival">Archival</option>
+                    </select>
                   </div>
                   <div className="form-group col-sm-3">
                     <label>Version Control System</label>
                     <input type="text" className="form-control" placeholder="ex. Git" defaultValue={curRepo.vcs} name='vcs' onChange={this.handleChange.bind(this)}/>
                   </div>
                   <div className="form-group col-sm-3">
-                    <label>Availability</label><br />
-                    <input type="checkbox" name="inline-checkbox1" defaultChecked={curRepo.reusable} name='reusable' onChange={this.handleChange.bind(this)}/> Reusable
-                    &nbsp; &nbsp;
-                    <input type="checkbox" name="inline-checkbox1" defaultChecked={curRepo.open_source} name='open_source' onChange={this.handleChange.bind(this)}/> Open Source
+                    <label>Usage</label>
+                    <select className="form-control" defaultValue={curRepo.usage_type} name='usage_type' onChange={this.handleChange.bind(this)}>
+                      <option value="openSource">Open Source</option>
+                      <option value="governmentWideReuse">Government-wide Reuse</option>
+                      <option value="exemptByLaw">Exempt by Law</option>
+                      <option value="exemptByNationalSecurity">Exempt by National Security</option>
+                      <option value="exemptByAgencySystem">Exempt by Agency System</option>
+                      <option value="exemptByAgencyMission">Exempt by Agency Mission</option>
+                      <option value="exemptByCIO">Exempt by CIO</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="row">
+                  <div className="form-group col-sm-3">
+                    <label>Version</label>
+                    <input type="text" className="form-control" placeholder="ex. 1.0.0"  defaultValue={curRepo.version} name='version' onChange={this.handleChange.bind(this)}/>
+                  </div>
+                  <div className="form-group col-sm-3">
+                    <label>Labor Hours</label>
+                    <input type="number" className="form-control" placeholder="ex. 1000"  defaultValue={curRepo.labor_hours} name='labor_hours' onChange={this.handleChange.bind(this)}/>
+                  </div>
+                </div>
+
+                <div className="row">
+                  <div className="form-group col-sm-6">
+                    <label>Disclaimer Text</label>
+                    <input type="text" className="form-control" placeholder="ex. This software is provided as-is with no warranty" defaultValue={curRepo.disclaimer_text} name='disclaimer_text' onChange={this.handleChange.bind(this)}/>
+                  </div>
+                  <div className="form-group col-sm-6">
+                    <label>Disclaimer URL</label>
+                    <input type="text" className="form-control" placeholder="ex. https://github.com/presidential-innovation-fellows/code-gov-web/disclaimer.md" defaultValue={curRepo.disclaimer_url} name='disclaimer_url' onChange={this.handleChange.bind(this)}/>
                   </div>
                 </div>
 
@@ -235,6 +392,21 @@ class EditRepo extends Component {
                 </div>
 
                 <div className="row">
+                  <div className="form-group col-sm-4">
+                    <label>Created</label>
+                    <input type="text" className="form-control" placeholder="ex. 2016-04-12" defaultValue={curRepo.date_created} name='date_created' onChange={this.handleChange.bind(this)}/>
+                  </div>
+                  <div className="form-group col-sm-4">
+                    <label>Last Modified</label>
+                    <input type="text" className="form-control" placeholder="ex. 2016-04-12" defaultValue={curRepo.date_last_modified} name='date_last_modified' onChange={this.handleChange.bind(this)}/>
+                  </div>
+                  <div className="form-group col-sm-4">
+                    <label>Metadata Last Updated</label>
+                    <input type="text" className="form-control" placeholder="ex. 2016-04-13"  defaultValue={curRepo.date_metadata_last_updated} name='date_metadata_last_updated' onChange={this.handleChange.bind(this)}/>
+                  </div>
+                </div>
+
+                <div className="row">
                   <div className="form-group col-sm-3">
                     <label>Exemption</label>
                     <input type="text" className="form-control" placeholder="ex. 0" defaultValue={curRepo.exemption} name='exemption' onChange={this.handleChange.bind(this)}/>
@@ -244,6 +416,20 @@ class EditRepo extends Component {
                     <input type="text" className="form-control" placeholder="ex. National Security" defaultValue={curRepo.exemption_text} name='exemption_text' onChange={this.handleChange.bind(this)}/>
                   </div>
                 </div>
+
+                <hr />
+                <h6>Licenses</h6>
+                <div className="row">
+                  <div className="col-sm-3">
+                    <label>Name</label>
+                  </div>
+                  <div className="col-sm-3">
+                    <label>URL</label>
+                  </div>
+                </div>
+                { _licensesInputs }
+
+                <button className='btn btn-primary btn-sm' onClick={this.addLicense.bind(this)}><i className='fa fa-plus'></i> Add New License</button>
 
                 <hr />
                 <h6>Partners</h6>
@@ -279,6 +465,37 @@ class EditRepo extends Component {
                     handleAddition={this.handleAddition.bind(this, 'languages') }
                     handleDrag={this.handleDrag.bind(this, 'languages') } />
                 </div>
+
+                <hr />
+                <h6>Related Code</h6>
+                <div className="row">
+                  <div className="col-sm-3">
+                    <label>Name</label>
+                  </div>
+                  <div className="col-sm-3">
+                    <label>URL</label>
+                  </div>
+                  <div className="col-sm-3">
+                    <label>Is Government?</label>
+                  </div>
+                </div>
+                { _relatedCodeInputs }
+
+                <button className='btn btn-primary btn-sm' onClick={this.addRelatedCode.bind(this)}><i className='fa fa-plus'></i> Add Related Code</button>
+
+                <hr />
+                <h6>Reused Code</h6>
+                <div className="row">
+                  <div className="col-sm-3">
+                    <label>Name</label>
+                  </div>
+                  <div className="col-sm-3">
+                    <label>URL</label>
+                  </div>
+                </div>
+                { _reusedCodeInputs }
+
+                <button className='btn btn-primary btn-sm' onClick={this.addReusedCode.bind(this)}><i className='fa fa-plus'></i> Add Reused Code</button>
               </div>
             </div>
           </div>
