@@ -88,7 +88,7 @@ class EditRepo extends Component {
     updateVars['reused_code'] = JSON.stringify(reused_code);
 
     post(resolveBackendUrl('/repos/update'), Session.getToken(), updateVars, function(err, data) {
-      // window.location.reload();
+      window.location.reload();
     });
   }
 
@@ -288,7 +288,7 @@ class EditRepo extends Component {
               </div>
               <div className="card-block">
                 <div className="row">
-                  <div className="form-group col-sm-4">
+                  <div className="form-group col-sm-8">
                     <label>Repository Name</label>
                     <input type="text" className="form-control" placeholder="ex. HR Recruiting Management" defaultValue={curRepo.name} name='name' onChange={this.handleChange.bind(this)}/>
                   </div>
@@ -298,14 +298,17 @@ class EditRepo extends Component {
                   </div>
                 </div>
 
-
                 <div className="form-group">
                   <label>Description</label>
                   <textarea rows='3' type="text" className="form-control" placeholder="ex. Helps HR recruit the best candidates!"  defaultValue={curRepo.description} name='description' onChange={this.handleChange.bind(this)}/>
                 </div>
 
                 <div className="row">
-                  <div className="form-group col-sm-3">
+                  <div className="form-group col-sm-4">
+                    <label>Version</label>
+                    <input type="text" className="form-control" placeholder="ex. 1.0.0"  defaultValue={curRepo.version} name='version' onChange={this.handleChange.bind(this)}/>
+                  </div>
+                  <div className="form-group col-sm-4">
                     <label>Status</label>
                     <select className="form-control" defaultValue={curRepo.status} name='status' onChange={this.handleChange.bind(this)}>
                       <option value="Ideation">Ideation</option>
@@ -317,11 +320,14 @@ class EditRepo extends Component {
                       <option value="Archival">Archival</option>
                     </select>
                   </div>
-                  <div className="form-group col-sm-3">
-                    <label>Version Control System</label>
-                    <input type="text" className="form-control" placeholder="ex. Git" defaultValue={curRepo.vcs} name='vcs' onChange={this.handleChange.bind(this)}/>
+                  <div className="form-group col-sm-4">
+                    <label>Labor Hours</label>
+                    <input type="number" className="form-control" placeholder="ex. 1000"  defaultValue={curRepo.labor_hours} name='labor_hours' onChange={this.handleChange.bind(this)}/>
                   </div>
-                  <div className="form-group col-sm-3">
+                </div>
+
+                <div className="row">
+                  <div className="form-group col-sm-4">
                     <label>Usage</label>
                     <select className="form-control" defaultValue={curRepo.usage_type} name='usage_type' onChange={this.handleChange.bind(this)}>
                       <option value="openSource">Open Source</option>
@@ -336,22 +342,33 @@ class EditRepo extends Component {
                 </div>
 
                 <div className="row">
-                  <div className="form-group col-sm-3">
-                    <label>Version</label>
-                    <input type="text" className="form-control" placeholder="ex. 1.0.0"  defaultValue={curRepo.version} name='version' onChange={this.handleChange.bind(this)}/>
+                  <div className="form-group col-sm-4">
+                    <label>Version Control System</label>
+                    <input type="text" className="form-control" placeholder="ex. Git" defaultValue={curRepo.vcs} name='vcs' onChange={this.handleChange.bind(this)}/>
                   </div>
-                  <div className="form-group col-sm-3">
-                    <label>Labor Hours</label>
-                    <input type="number" className="form-control" placeholder="ex. 1000"  defaultValue={curRepo.labor_hours} name='labor_hours' onChange={this.handleChange.bind(this)}/>
+                  <div className="form-group col-sm-4">
+                    <label>Source Code URL</label>
+                    <input type="text" className="form-control" placeholder="ex. https://github.com/presidential-innovation-fellows/code-gov-web" defaultValue={curRepo.source_code_url} name='source_code_url' onChange={this.handleChange.bind(this)}/>
                   </div>
                 </div>
 
                 <div className="row">
-                  <div className="form-group col-sm-6">
+                  <div className="form-group col-sm-4">
+                    <label>Homepage URL</label>
+                    <input type="text" className="form-control" placeholder="ex. https://code.gov" defaultValue={curRepo.homepage_url} name='homepage_url' onChange={this.handleChange.bind(this)}/>
+                  </div>
+                  <div className="form-group col-sm-4">
+                    <label>Download URL</label>
+                    <input type="text" className="form-control" placeholder="ex. https://github.com/presidential-innovation-fellows/code-gov-web/dist.tar.gz"  defaultValue={curRepo.download_url} name='download_url' onChange={this.handleChange.bind(this)}/>
+                  </div>
+                </div>
+
+                <div className="row">
+                  <div className="form-group col-sm-4">
                     <label>Disclaimer Text</label>
                     <input type="text" className="form-control" placeholder="ex. This software is provided as-is with no warranty" defaultValue={curRepo.disclaimer_text} name='disclaimer_text' onChange={this.handleChange.bind(this)}/>
                   </div>
-                  <div className="form-group col-sm-6">
+                  <div className="form-group col-sm-4">
                     <label>Disclaimer URL</label>
                     <input type="text" className="form-control" placeholder="ex. https://github.com/presidential-innovation-fellows/code-gov-web/disclaimer.md" defaultValue={curRepo.disclaimer_url} name='disclaimer_url' onChange={this.handleChange.bind(this)}/>
                   </div>
@@ -378,21 +395,6 @@ class EditRepo extends Component {
 
                 <div className="row">
                   <div className="form-group col-sm-4">
-                    <label>Source Code URL</label>
-                    <input type="text" className="form-control" placeholder="ex. https://github.com/presidential-innovation-fellows/code-gov-web" defaultValue={curRepo.source_code_url} name='source_code_url' onChange={this.handleChange.bind(this)}/>
-                  </div>
-                  <div className="form-group col-sm-4">
-                    <label>Homepage URL</label>
-                    <input type="text" className="form-control" placeholder="ex. https://code.gov" defaultValue={curRepo.homepage_url} name='homepage_url' onChange={this.handleChange.bind(this)}/>
-                  </div>
-                  <div className="form-group col-sm-4">
-                    <label>Download URL</label>
-                    <input type="text" className="form-control" placeholder="ex. https://github.com/presidential-innovation-fellows/code-gov-web/dist.tar.gz"  defaultValue={curRepo.download_url} name='download_url' onChange={this.handleChange.bind(this)}/>
-                  </div>
-                </div>
-
-                <div className="row">
-                  <div className="form-group col-sm-4">
                     <label>Created</label>
                     <input type="text" className="form-control" placeholder="ex. 2016-04-12" defaultValue={curRepo.date_created} name='date_created' onChange={this.handleChange.bind(this)}/>
                   </div>
@@ -403,17 +405,6 @@ class EditRepo extends Component {
                   <div className="form-group col-sm-4">
                     <label>Metadata Last Updated</label>
                     <input type="text" className="form-control" placeholder="ex. 2016-04-13"  defaultValue={curRepo.date_metadata_last_updated} name='date_metadata_last_updated' onChange={this.handleChange.bind(this)}/>
-                  </div>
-                </div>
-
-                <div className="row">
-                  <div className="form-group col-sm-3">
-                    <label>Exemption</label>
-                    <input type="text" className="form-control" placeholder="ex. 0" defaultValue={curRepo.exemption} name='exemption' onChange={this.handleChange.bind(this)}/>
-                  </div>
-                  <div className="form-group col-sm-4">
-                    <label>Exemption Text</label>
-                    <input type="text" className="form-control" placeholder="ex. National Security" defaultValue={curRepo.exemption_text} name='exemption_text' onChange={this.handleChange.bind(this)}/>
                   </div>
                 </div>
 
