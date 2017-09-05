@@ -3,7 +3,7 @@ import { Bar, Line } from 'react-chartjs-2';
 import { Dropdown, DropdownMenu, DropdownItem, Progress } from 'reactstrap';
 import { NavLink } from 'react-router-dom'
 import Session from '../../middleware/Session';
-import { post, resolveBackendUrl } from '../../middleware/Networking';
+import { get, post, resolveBackendUrl } from '../../middleware/Networking';
 import javascriptTimeAgo from 'javascript-time-ago'
 import ReactConfirmAlert, { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
@@ -150,7 +150,10 @@ class Dashboard extends Component {
                   <button type="button" onClick={()=> $('#my-file').click()} className="btn btn-sm btn-primary"><i className="fa fa-plus" ></i> Import from Code.json
                   </button>&nbsp;&nbsp;&nbsp;
                   <button type="button" className="btn btn-sm btn-success" onClick={this.addRepo.bind(this)}><i className="fa fa-plus" ></i> Add New Repository
-                  </button>
+                  </button>&nbsp;&nbsp;&nbsp;
+                  <a role="button" href={resolveBackendUrl('/repos')} className="btn btn-sm btn-light">
+                    <i className="fa fa-download" ></i> Export to Code.json
+                  </a>
                 </div>
                 Current {agency.acronym} Repositories
               </div>

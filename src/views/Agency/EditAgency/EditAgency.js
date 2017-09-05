@@ -14,7 +14,7 @@ class EditAgency extends Component {
 
     this.state = {
       agency: agency,
-      updateVars: {}
+      updateVars: agency
     };
   }
 
@@ -88,13 +88,24 @@ class EditAgency extends Component {
 
                 <div className="row">
                   <div className="form-group col-sm-4">
-                    <label>Source Code Main URL</label>
-                    <input type="text" className="form-control" placeholder="ex. https://github.com/presidential-innovation-fellows/" defaultValue={agency.source_code_url} name='source_code_url' onChange={this.handleChange.bind(this)}/>
+                    <label>20% Measurement</label>
+                    <select className="form-control" defaultValue={agency.measurement_type_method} name="measurement_type_method" onChange={this.handleChange.bind(this)}>
+                      <option value="linesOfCode">Source lines of code</option>
+                      <option value="modules">Number of self-contained modules</option>
+                      <option value="cost">Cost of software development</option>
+                      <option value="projects">Number of software projects</option>
+                      <option value="systems">System certification and accreditation boundaries</option>
+                      <option value="other">Other</option>
+                    </select>
                   </div>
-                  <div className="form-group col-sm-4">
-                    <label>Homepage URL</label>
-                    <input type="text" className="form-control" placeholder="ex. https://code.gov" defaultValue={agency.homepage_url} name='homepage_url' onChange={this.handleChange.bind(this)}/>
-                  </div>
+                  {
+                    this.state.updateVars.measurement_type_method === 'other' ?
+                      <div className="form-group col-sm-4">
+                        <label>Other measurement description</label>
+                        <input type="text" className="form-control" placeholder="ex. Number of hours worked on the project" defaultValue={agency.measurement_type_if_other} name='measurement_type_if_other' onChange={this.handleChange.bind(this)}/>
+                      </div> :
+                      null
+                  }
                 </div>
               </div>
             </div>
